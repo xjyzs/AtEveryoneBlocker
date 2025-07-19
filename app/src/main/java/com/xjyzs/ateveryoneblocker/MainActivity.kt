@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,10 +19,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -35,9 +41,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.xjyzs.ateveryoneblocker.ui.theme.AtEveryoneBlockerTheme
@@ -76,7 +84,7 @@ fun MainUI(modifier: Modifier) {
             }
             if (File("/data/local/tmp/groups").exists()) {
                 val txt = File("/data/local/tmp/groups").readText()
-                groups = if (txt.length>0){txt.substring(0, txt.length - 1)}else{txt}
+                groups = if (txt.isNotEmpty()){txt.substring(0, txt.length - 1)}else{txt}
             }
             process = ProcessBuilder("su").apply {
                 redirectErrorStream(true)
@@ -86,7 +94,23 @@ fun MainUI(modifier: Modifier) {
             Toast.makeText(context, "请先授予root权限：" + e.message, Toast.LENGTH_SHORT).show()
         }
     }
-    Column(modifier.wrapContentSize(Alignment.Center)){
+    Column(modifier.wrapContentSize(Alignment.Center).verticalScroll(rememberScrollState())){
+        Row(verticalAlignment = Alignment.CenterVertically){
+        if (isModuleActive()) {
+            Icon(Icons.Default.CheckCircle, null, tint = Color.Green)
+
+        }else{
+            Icon(Icons.Default.AddCircle, null, Modifier.rotate(45f), tint = Color.Red)
+        }
+            Text(
+                if (isModuleActive()) {
+                    "模块已激活"
+                } else {
+                    "模块未激活"
+                }, fontSize = 24.sp, fontWeight = FontWeight.Bold
+            )
+        }
+        Spacer(Modifier.height(36.dp))
         Row(verticalAlignment = Alignment.CenterVertically){
             Button(
                 {
@@ -101,7 +125,7 @@ fun MainUI(modifier: Modifier) {
                 shape = RectangleShape,
                 contentPadding = PaddingValues(0.dp)
             ) {
-                Text("黑名单模式", fontSize = 24.sp)
+                Text("黑名单模式", fontSize = 24.sp, fontWeight = FontWeight.Normal)
                 Spacer(Modifier.weight(1f))
                 Switch(checked = blacklistMode, onCheckedChange = {
                     blacklistMode = it
@@ -138,3 +162,6 @@ fun clickVibrate(vibrator: Vibrator){
         )
     }
 }
+
+@Keep
+fun isModuleActive(): Boolean = false
