@@ -76,7 +76,7 @@ fun MainUI(modifier: Modifier) {
             }
             if (File("/data/local/tmp/groups").exists()) {
                 val txt = File("/data/local/tmp/groups").readText()
-                groups = txt.substring(0, txt.length - 1)
+                groups = if (txt.length>0){txt.substring(0, txt.length - 1)}else{txt}
             }
             process = ProcessBuilder("su").apply {
                 redirectErrorStream(true)
@@ -115,7 +115,7 @@ fun MainUI(modifier: Modifier) {
         Text("${if (blacklistMode){"黑"}else{"白"}}名单群聊名称(每行一个)")
         TextField(groups, {
             groups=it
-            outputStream!!.write(("echo $groups > ${tmpPath}groups\n").toByteArray())
+            outputStream!!.write(("echo '''$groups''' > ${tmpPath}groups\n").toByteArray())
             outputStream!!.flush()
         }, Modifier.fillMaxWidth(), maxLines = 10)
         Spacer(Modifier.height(60.dp))
