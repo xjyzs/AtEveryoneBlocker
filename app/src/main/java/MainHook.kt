@@ -28,7 +28,6 @@ class MainHook : IXposedHookLoadPackage {
                     Notification::class.java,
                     object : XC_MethodHook() {
                         override fun beforeHookedMethod(param: MethodHookParam) {
-                            LogToFile.log(File("/data/local/tmp/blacklistMode").readText())
                             //val id = param.args[0] as Int
                             val notification = param.args[1] as Notification
                             val extras: Bundle? = notification.extras
